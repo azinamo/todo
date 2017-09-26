@@ -9,10 +9,6 @@ class Model
 
     protected $db;
 
-    function __construct()
-    {
-        $this->db = DBConn::getInstance();
-    }
 
     public function getTablename()
     {
@@ -41,6 +37,28 @@ class Model
         }
         $this->db->update($table, $data, "id={$id}");
         return $this->db->affected_rows();
+
+    }
+
+    public function verifyUser($id, $data)
+    {
+        try {
+            // prepare sql and bind parameters
+            $vstmt = $vdb->conn->prepare('UPDATE '.$tbl_members.' SET verified = :verify WHERE id = :uid');
+            $vstmt->bindParam(':uid', $uid);
+            $vstmt->bindParam(':verify', $verify);
+            $vstmt->execute();
+
+        } catch (PDOException $v) {
+
+            $verr = 'Error: ' . $v->getMessage();
+
+        }
+
+        //Determines returned value ('true' or error code)
+        $resp = ($verr == '') ? 'true' : $verr;
+
+        return $resp;
     }
 
 }

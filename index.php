@@ -1,9 +1,9 @@
 <?php
-include_once 'classes/DBConn.php';
-include_once 'classes/Model.php';
-include_once 'classes/Task.php';
+require_once 'dbconf.php';
+require_once 'classes/DBConn.php';
+require_once 'classes/Task.php';
 $taskObj = new \Todo\Task();
-$tasks = $taskObj->getAll();
+$tasks = $taskObj->getTasks();
 ?>
 
 <!DOCTYPE html>
@@ -25,18 +25,24 @@ $tasks = $taskObj->getAll();
 
     <h1>TODO</h1>
     <div class="row">
+        <span id="message"></span>
         <table id="todo" class="table table-bordered">
             <tr>
-                <td>Task</td>
-                <td>Completed</td>
+                <th>
+                    <input type="checkbox" name="all_completed" name="all_completed" class="checkbox all_completed" onchange="markAllCompleted(this)" />
+                </th>
+                <th>Task</th>
+                <th>
+                    Completed
+                </th>
             </tr>
             <?php if (!empty($tasks)): ?>
                 <?php foreach($tasks as $task): ?>
                     <tr>
-                        <td><?php echo $task->task; ?></td>
+                        <td><?php echo $task['task']; ?></td>
                         <td>
-                            <?php if($task->is_completed): ?>
-                                <input type="checkbox" name="is_completed_<?php echo $task->task; ?>"  name="is_completed[<?php echo $task->task; ?>]" class="checkbox completed" />
+                            <?php if($task['status'] !== 'completed'): ?>
+                                <input type="checkbox" name="is_completed_<?php echo $task['id']; ?>" value="<?php echo $task['id']; ?>" name="is_completed[<?php echo $task['id']; ?>]" class="checkbox completed" onchange="markAsCompleted(this, '<?php echo $task['id']; ?>')" />
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -63,20 +69,36 @@ $tasks = $taskObj->getAll();
 <script src="js/jquery-1.9.1.min.js"></script>
 <script src="js/todo.js"></script>
 <script>
+    var todo = window.Todo || {};
     $(function(){
-        var todo = window.Todo || {};
-        console.log( todo );
+
         $("#add_task").on('click', function(){
             var taskName = $("#task").val()
             if (taskName == '') {
                 alert('Please enter the task name');
                 return false;
             } else {
-                todo.addTask({'name': taskName});
+                todo.addTask({'task': taskName});
             }
         });
-
     });
+
+    function markAsCompleted(el, taskId){
+        if ($(el).is(":checked")) {
+            todo.updateTask(taskId, {'status' : 'completed'})
+        }
+    }
+
+    function markAllCompleted(el, taskId){
+        if ($(el).is(":checked")) {
+            var tasks = [];
+            $(".completed").each(function(){
+                tasks.push($(this).val());
+            });
+            todo.updateAllTasks(tasks, {'status' : 'completed'})
+        }
+    }
+
 </script>
 </body>
 </html>
