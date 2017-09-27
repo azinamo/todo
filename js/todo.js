@@ -6,6 +6,27 @@
 
     var messageDiv = $("#message");
     var baseUrl = './task.php';
+    var tasksTable = $("#tasks");
+
+    todo.loadTasks = function(){
+        messageDiv.html('...');
+        $.get(baseUrl, {
+            action: 'get_all',
+        }, function(tasksHtml) {
+            $("#tasks").html( tasksHtml );
+        }, 'html')
+    };
+
+    todo.getTask = function(taskId){
+
+        messageDiv.html('Updating ...');
+        $.get(baseUrl, {
+            action: 'get_task',
+            task_id: taskId
+        }, function(tasksHtml) {
+            tasksTable.find('tbody').append( tasksHtml );
+        }, 'html')
+    };
 
     todo.addTask = function(data){
         messageDiv.html('saving task ...');
@@ -14,8 +35,9 @@
                 messageDiv.addClass('alert-danger').html( response.text );
             } else {
                 messageDiv.addClass('alert-success').html( response.text );
+                todo.getTask(response.id);
             }
-        });
+        }, 'json');
     };
 
     todo.deleteTask = function(){
@@ -75,6 +97,7 @@
         $.ajax({
           url : baseUrl,
           method: 'post',
+          dataType: 'json',
           data: {'action': action, data: data },
           success: successFxn,
           error: function(){

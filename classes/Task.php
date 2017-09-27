@@ -12,9 +12,11 @@ class Task
 
     protected $tableName = 'tasks';
 
+    protected $conn = null;
+
     function __construct()
     {
-        $this->db = DBConn::getInstance();
+        $this->conn = DBConn::getInstance()->connect();
     }
 
 
@@ -54,16 +56,18 @@ class Task
         foreach ($task as $k => $v) $saveSql .= " {$k} = '".$v."' , ";
         $saveSql = rtrim($saveSql, ', ');
 
-        $stmt = $this->db->conn->prepare("INSERT INTO  ".$this->tableName." SET $saveSql ");
+        $stmt = $this->conn->prepare("INSERT INTO  ".$this->tableName." SET $saveSql ");
 
-        return $stmt->execute();
+        $stmt->execute();
+
+        return $this->conn->lastInsertId();
     }
 
 
-    public function getTasks($id)
+    public function getTasks()
     {
         try {
-            $stmt = $this->db->conn->prepare("SELECT * FROM ".$this->tableName." WHERE 1 ORDER BY created_at ASC");
+            $stmt = $this->conn->prepare("SELECT * FROM ".$this->tableName." WHERE 1 ORDER BY id DESC");
             $stmt->execute();
             $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -77,8 +81,7 @@ class Task
     public function getTask($id)
     {
         try {
-
-            $stmt = $this->db->conn->prepare("SELECT * FROM ".$this->tableName." WHERE id = :taskid");
+            $stmt = $this->conn->prepare("SELECT * FROM ".$this->tableName." WHERE id = :taskid");
             $stmt->bindParam(':taskid', $id);
             $stmt->execute();
             $result = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -98,7 +101,7 @@ class Task
             foreach($data as $k => $v) $updateSql .= " {$k} = '".$v."', ";
             $updateSql = rtrim($updateSql, ', ');
 
-            $stmt = $this->db->conn->prepare("UPDATE $this->tableName  SET $updateSql WHERE id = :id");
+            $stmt = $this->conn->prepare("UPDATE $this->tableName  SET $updateSql WHERE id = :id");
             $stmt->bindParam(':id', $id);
             $resp = $stmt->execute();
 
@@ -119,7 +122,7 @@ class Task
             $updateSql = rtrim($updateSql, ', ');
 echo "UPDATE $this->tableName  SET $updateSql WHERE IN (".implode(',', $tasksIds).")";
             exit();
-            $stmt = $this->db->conn->prepare("UPDATE $this->tableName  SET $updateSql WHERE IN (".implode(',', $tasksIds).")");
+            $stmt = $this->conn->prepare("UPDATE $this->tableName  SET $updateSql WHERE IN (".implode(',', $tasksIds).")");
             $resp = $stmt->execute();
 
         } catch (\PDOException $v) {

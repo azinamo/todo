@@ -9,7 +9,7 @@ if (isset($_POST['action']) && !empty($_POST['action'])) {
                 $taskObj = new \Todo\Task();
                 $task = $taskObj->save($_POST['data']);
                 if ($task) {
-                   $reponse = ['text' => 'Task saved successfully', 'error' => false];
+                   $reponse = ['text' => 'Task saved successfully', 'error' => false, 'id' => $task];
                 } else {
                     $reponse = ['text' => 'Task could not be save', 'error' => true];
                 }
@@ -43,14 +43,21 @@ if (isset($_POST['action']) && !empty($_POST['action'])) {
                 $reponse = ['text' => 'Task could not be save', 'error' => true];
             }
             break;
-        case 'getAll':
+        case 'get_task':
+            echo "Teting";
+            exit();
+            $taskObj = new \Todo\Task();
+            $task = $taskObj->getTask($id);
+            var_dump($task);
+            exit();
+            echo include_once'includes/task.php';
+            die();
+            break;
+        case 'get_all':
             $taskObj = new \Todo\Task();
             $tasks = $taskObj->getAll();
-            if ($tasks) {
-                $reponse = ['text' => 'Task updated successfully', 'error' => false, 'data' => $tasks];
-            } else {
-                $reponse = ['text' => 'Task could not be save', 'error' => true];
-            }
+            include_once 'includes/tasks.php';
+            die();
             break;
         default:
             $reponse = ['text' => 'Action not found', 'error' => true];
