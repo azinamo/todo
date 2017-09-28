@@ -14,8 +14,8 @@ class DBConn
             $this->connection = new \PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME. ';charset=utf8', DB_USERNAME, DB_PASSWORD);
             $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\Exception $e) {
-            die('Database connection error '.$e->getMessage());
-            //error_log('Database connection error '.$e);
+            error_log('Database connection error '.$e);
+            die('Database connection error, please ensure database settings are correct');
         }
 
     }

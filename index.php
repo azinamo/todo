@@ -28,7 +28,7 @@ $tasks = $taskObj->getTasks();
 
     <h1>TODO</h1>
     <div class="row">
-        <span id="message"></span>
+
         <?php include_once 'includes/tasks.php'; ?>
     </div>
 
@@ -46,20 +46,29 @@ $tasks = $taskObj->getTasks();
     $(function(){
 
         $("#add_task").on('click', function(){
+            $("#response").show();
+            var placeholder = $("#placeholder");
             var taskName = $("#task");
             if (taskName.val() == '') {
                 alert('Please enter the task name');
                 taskName.focus();
                 return false;
             } else {
+                $("#response").show();
                 todo.addTask({'task': taskName.val()});
+                taskName.val('');
+                if (placeholder.length > 0) {
+                    placeholder.remove();
+                }
             }
         });
     });
 
     function markAsCompleted(el, taskId){
         if ($(el).is(":checked")) {
-            todo.updateTask(taskId, {'status' : 'completed'})
+            var tasks = [taskId];
+            $("#response").show();
+            todo.updateTasks(tasks, {'status' : 'completed'})
         }
     }
 
@@ -69,7 +78,8 @@ $tasks = $taskObj->getTasks();
             $(".completed").each(function(){
                 tasks.push($(this).val());
             });
-            todo.updateAllTasks(tasks, {'status' : 'completed'})
+            $("#response").show();
+            todo.updateTasks(tasks, {'status' : 'completed'})
         }
     }
 

@@ -53,6 +53,7 @@ class Task
     public function save($task)
     {
         $saveSql = "";
+        $task['created_at'] = date('Y-m-d');
         foreach ($task as $k => $v) $saveSql .= " {$k} = '".$v."' , ";
         $saveSql = rtrim($saveSql, ', ');
 
@@ -120,9 +121,7 @@ class Task
             $updateSql = "";
             foreach($data as $k => $v) $updateSql .= " {$k} = '".$v."', ";
             $updateSql = rtrim($updateSql, ', ');
-echo "UPDATE $this->tableName  SET $updateSql WHERE IN (".implode(',', $tasksIds).")";
-            exit();
-            $stmt = $this->conn->prepare("UPDATE $this->tableName  SET $updateSql WHERE IN (".implode(',', $tasksIds).")");
+            $stmt = $this->conn->prepare("UPDATE $this->tableName  SET $updateSql WHERE id IN (".implode(',', $tasksIds).")");
             $resp = $stmt->execute();
 
         } catch (\PDOException $v) {
